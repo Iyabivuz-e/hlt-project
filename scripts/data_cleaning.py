@@ -2,96 +2,83 @@ import pandas as pd
 
 class DataCleaner:
     """
-    A class for fully cleaning a dataset by removing all types of duplicate entries.
-
-    Steps performed:
-    - Remove perfect duplicates (same text and label)
-    - Remove conflicting duplicates (same text, different labels)
-    - Remove pure text duplicates
+    A class for cleaning a dataset by removing duplicates and missing values,
+    handling one or more text columns and a label column.
     """
 
-    def __init__(self, df: pd.DataFrame, text_column: str = 'tweet_text', label_column: str = 'cyberbullying_type'):
-        """
-        Initializes the DataCleaner with the given DataFrame and column names.
-
-        Args:
-            df (pd.DataFrame): Input dataset containing text and labels.
-            text_column (str): Name of the column containing text.
-            label_column (str): Name of the column containing labels.
-        """
+    def __init__(self, df: pd.DataFrame, text_column, label_column: str = 'cyberbullying_type'):
         if df.empty:
             raise ValueError("The provided dataset is empty.")
+
+        if isinstance(text_column, str):
+            self.text_columns = [text_column]
+        elif isinstance(text_column, list):
+            self.text_columns = text_column
+        else:
+            raise TypeError("text_column must be a string or list of strings.")
+
         self.df = df
-        self.text_column = text_column
         self.label_column = label_column
 
-    def clean_all_duplicates(self) -> pd.DataFrame:
+    def clean_text_duplicates(self) -> pd.DataFrame:
         """
-        Perform full cleaning by sequentially removing:
-        1. Perfect duplicates (identical text and label)
-        2. Conflicting duplicates (same text assigned to different labels)
-        3. Pure text duplicates (identical texts regardless of label)
-
-        Returns:
-            pd.DataFrame: Cleaned dataset with duplicates removed.
+        Removes text duplicates across multiple text columns:
+        - Removes rows with same text but different labels (imperfect duplicates)
+        - Keeps only one row for same text and same label (perfect duplicates)
         """
-        print(f"\n--- CLEANING DUPLICATES BASED ON TEXT COLUMN: {self.text_column} ---")
+        print(f"\n--- CLEANING DUPLICATES COLUMN BY COLUMN: {self.text_columns} ---")
+        before_total = self.df.shape[0]
+        rows_to_keep = pd.Series([True] * len(self.df), index=self.df.index)
 
-        try:
-            # Step 1: Remove perfect duplicates
-            print("\n[1/3] Removing perfect duplicates...")
-            before = self.df.shape[0]
-            self.df = self.df.drop_duplicates(subset=[self.text_column, self.label_column]).reset_index(drop=True)
-            after = self.df.shape[0]
-            print(f"Removed {before - after} perfect duplicates.")
+        for text_col in self.text_columns:
+            print(f"\nProcessing column: '{text_col}'")
 
-            # Step 2: Remove conflicting label duplicates
-            print("\n[2/3] Removing conflicting label duplicates...")
-            before = self.df.shape[0]
-            conflict_texts = (
-                self.df.groupby(self.text_column)[self.label_column]
-                .nunique()
-                .reset_index()
-                .query(f"{self.label_column} > 1")[self.text_column]
-                .tolist()
-            )
-            self.df = self.df[~self.df[self.text_column].isin(conflict_texts)].reset_index(drop=True)
-            after = self.df.shape[0]
-            print(f"Removed {before - after} conflicting label rows.")
+            # 1. Trova tutti i duplicati (testo ripetuto in quella colonna)
+            duplicates_all = self.df[self.df.duplicated(subset=[text_col], keep=False)]
 
-            # Step 3: Remove pure text duplicates
-            print("\n[3/3] Forcing final text-only duplicate removal...")
-            before = self.df.shape[0]
-            self.df = self.df.drop_duplicates(subset=[self.text_column]).reset_index(drop=True)
-            after = self.df.shape[0]
-            print(f"Removed {before - after} pure text duplicates.")
+            # 2. Identifica duplicati imperfetti (stesso testo, label diversa)
+            duplicates_imperfect = duplicates_all[
+                self.df.duplicated(subset=[text_col], keep=False) &
+                self.df.duplicated(subset=[text_col, self.label_column], keep=False) == False
+            ]
+            conflicted_texts = duplicates_imperfect[text_col].unique().tolist()
 
-            print("\nDUPLICATE CLEANING COMPLETED.")
+            # 3. Rimuovi tutte le righe con quei testi ambigui
+            mask_conflict = self.df[text_col].isin(conflicted_texts)
+            rows_to_keep &= ~mask_conflict
 
-        except KeyError as e:
-            print(f"Column not found during duplicate cleaning: {e}")
+            # 4. Tra i duplicati perfetti, tieni solo la prima occorrenza
+            df_temp = self.df[~mask_conflict].copy()
+            duplicated_perfect_mask = df_temp.duplicated(subset=[text_col, self.label_column], keep='first')
+            rows_to_keep[df_temp[duplicated_perfect_mask].index] = False
 
+            print(f" - Removed {mask_conflict.sum()} imperfect duplicates (conflicting labels)")
+            print(f" - Removed {duplicated_perfect_mask.sum()} perfect duplicates (keeping one)")
+
+        # Applica la maschera finale
+        self.df = self.df[rows_to_keep].reset_index(drop=True)
+        after_total = self.df.shape[0]
+        print(f"\nTotal rows removed: {before_total - after_total}")
+        print("--- DUPLICATE CLEANING COMPLETED ---")
         return self.df
-    
+
+
     def drop_missing_values(self, important_columns: list) -> pd.DataFrame:
         """
-        Remove rows with missing values in specified important columns, 
-        to ensure quality inputs for model training.
-        
-        Args:
-            important_columns (list): List of column names that must not contain missing values.
-
-        Returns:
-            pd.DataFrame: Cleaned dataset with missing values removed in important columns.
+        Drop rows from the DataFrame that contain missing values in the specified columns.
+        This method checks whether the specified columns exist, removes any rows with
+        missing (NaN) values in those columns, and prints the number of rows removed.
         """
-        print(f"\n--- DROPPING MISSING VALUES IN IMPORTANT COLUMNS: {important_columns} ---")
+        print(f"\n--- DROPPING MISSING VALUES IN: {important_columns} ---")
         missing_cols = [col for col in important_columns if col not in self.df.columns]
         if missing_cols:
-            raise KeyError(f"The following important columns are missing from the DataFrame: {missing_cols}")
+            raise KeyError(f"The following columns are missing in the DataFrame: {missing_cols}")
 
         before = self.df.shape[0]
         self.df = self.df.dropna(subset=important_columns).reset_index(drop=True)
         after = self.df.shape[0]
         print(f"Removed {before - after} rows with missing values.")
-        print("\nMISSING VALUES CLEANING COMPLETED.")
+        print("\nMISSING VALUE CLEANING COMPLETED.")
+
         return self.df
+
