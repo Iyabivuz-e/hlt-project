@@ -1,2 +1,115 @@
-*pycache*
-.venv
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.env/
+pip-log.txt
+pip-delete-this-directory.txt
+poetry.lock
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Pytest
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# PyLint
+pylint-report.txt
+pylint-global.txt
+
+# Bandit
+output.json
+
+# Cython debug symbols
+cython_debug/
+
+# Machine Learning / NLP specific
+*.h5
+*.ckpt
+*.pth
+*.pt
+*.tflite
+*.pb
+*.joblib
+*.pkl
+*.npz
+*.npy
+*.onnx
+runs/
+logs/
+wandb/
+mlruns/
+lightning_logs/
+tensorboard/
+checkpoints/
+
+# Large datasets (handle with DVC or manually)
+data/
+datasets/
+*.csv
+*.tsv
+*.json
+*.xlsx
+*.zip
+*.tar.gz
+
+# Tokenizers / Transformers cache
+*.tokenizer
+tokenizer_cache/
+transformers_cache/
+.huggingface/
+
+# dotenv
+*.env
+.env.*
+
+# System files
+.DS_Store
+Thumbs.db
