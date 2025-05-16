@@ -28,7 +28,7 @@ class DataSaver:
         try:
             if create_dir:
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            df.to_csv(output_path, index=False)
+            df.to_csv(output_path, index=False, encoding="utf-8")
             print(f"Dataset saved to {output_path}.")
         except (OSError, IOError) as e:
             print(f"Error saving the DataFrame to {output_path}: {e}")
