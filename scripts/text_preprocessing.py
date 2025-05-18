@@ -90,13 +90,6 @@ class TextPreprocessor:
         doc = self.nlp(text)
         return ' '.join([token.lemma_ for token in doc])
 
-    def stem_text(self, text):
-        """
-        Applies stemming using NLTK's PorterStemmer.
-        """
-        text = self._ensure_text(text)
-        return ' '.join([self.stemmer.stem(word) for word in text.split()])
-
     def clean_text_soft(self, text):
         """
         Soft cleaning optimized for Transformer-based models (e.g., BERT).
@@ -110,20 +103,21 @@ class TextPreprocessor:
         text = re.sub(r'<.*?>', '', text)                   # Remove HTML tags
         text = re.sub(r'\s+', ' ', text).strip()            # Normalize whitespace
         return text
-
+    
     def clean_text_full(self, text):
         """
-        Full cleaning: expands contractions, normalizes characters,
-        lowercases, removes stopwords, lemmatizes, stems.
+        Full cleaning: starts with soft cleaning (URLs, mentions, hashtags, etc.),
+        then expands contractions, normalizes, lowercases, removes stopwords, lemmatizes, and stems.
         """
+        text = self._ensure_text(text)
+        text = self.clean_text_soft(text)
         text = self.expand_contractions(text)
         text = self.normalize_repeated_chars(text)
         text = text.lower()
-        text = self.remove_stopwords(text)
+        text = re.sub(r"[^\w\s]", "", text)             # Remove punctuation (keep words and whitespace)
         text = self.lemmatize_text(text)
-        text = re.sub(r"[^\w\s]", "", text)
-        text = self.stem_text(text)
-        text = re.sub(r'\s+', ' ', text).strip()
+        text = self.remove_stopwords(text)
+        text = re.sub(r'\s+', ' ', text).strip()        # Normalize extra whitespace
         return text
 
     def preprocess(self, text, soft=True):

@@ -164,3 +164,52 @@ class DataBalancer:
         df_augmented = pd.DataFrame({text_column: augmented_texts, label_column: augmented_labels})
         df_balanced = pd.concat([df_majority, df_minority, df_augmented]).sample(frac=1).reset_index(drop=True)
         return df_balanced
+    
+    @staticmethod
+    def align_augmented_soft_and_full(df_soft_augmented: pd.DataFrame, df_full_augmented: pd.DataFrame) -> pd.DataFrame:
+        """
+        Aligns two augmented datasets (soft and full tweet versions) based on 
+        shared 'sample_id' and 'label' columns.
+
+        This function merges the two datasets, ensuring that each pair of soft and full
+        augmented tweets corresponds to the same original sample and label.
+
+        Args:
+            df_soft_augmented (pd.DataFrame): DataFrame with 'tweet_soft', 'label', 'sample_id'.
+            df_full_augmented (pd.DataFrame): DataFrame with 'tweet_full', 'label', 'sample_id'.
+
+        Returns:
+            pd.DataFrame: A merged DataFrame with aligned 'tweet_soft' and 'tweet_full' samples.
+
+        Raises:
+            ValueError: If required columns are missing in either input DataFrame.
+            AssertionError: If the merged DataFrame is empty or contains null values.
+        """
+        # Define required columns for validation
+        required_cols_soft = {'tweet_soft', 'label', 'sample_id'}
+        required_cols_full = {'tweet_full', 'label', 'sample_id'}
+
+        # Validate that input DataFrames contain required columns
+        if not required_cols_soft.issubset(df_soft_augmented.columns):
+            raise ValueError(f"df_soft_augmented must contain columns: {required_cols_soft}")
+        if not required_cols_full.issubset(df_full_augmented.columns):
+            raise ValueError(f"df_full_augmented must contain columns: {required_cols_full}")
+        
+        print("Aligning the augmented datasets...")
+
+        # Perform inner join on 'sample_id' and 'label' to align corresponding entries
+        df_combined = df_soft_augmented.merge(
+            df_full_augmented,
+            on=['sample_id', 'label'],
+            how='inner'
+        )
+
+        # Shuffle the resulting DataFrame to randomize row order
+        df_combined = df_combined.sample(frac=1, random_state=42).reset_index(drop=True)
+
+        # Assert the resulting DataFrame is not empty and has no missing values
+        assert len(df_combined) > 0, "The combined dataset is empty!"
+        assert df_combined[['tweet_soft', 'tweet_full', 'label']].isnull().sum().sum() == 0, "Null values found!"
+
+        print(f"Final aligned dataset: {len(df_combined)} rows.")
+        return df_combined
