@@ -1,13 +1,14 @@
+from logging import raiseExceptions
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer
 import numpy as np
 from datasets import Dataset
 import evaluate
 import torch
 import pandas as pd
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
 # A class that contains the finetuning of bertweet model
-
-
 class BertweetModel:
     def __init__(self, num_labels, model_name):
         # Initializing the model's instance variables
@@ -68,15 +69,17 @@ class BertweetModel:
             f1 = f1_metric.compute(
                 predictions=predictions, references=labels, average="weighted")
             return {
-                "accuracy": accuracy["accuracy"], "f1_wighted": f1["f1"]
+                "accuracy": accuracy["accuracy"], "f1_weighted": f1["f1"]
             }
         else:
             f1_metric = evaluate.load("f1")
             f1 = f1_metric.compute(
                 predictions=predictions, references=labels)
             return {
-                "accuracy": accuracy["accuracy"], "f1_wighted": f1["f1"]
+                "accuracy": accuracy["accuracy"], "f1_weighted": f1["f1"]
             }
+
+    # print("Training on device:", self.device)
 
     # ******* A function to finetune(train) the model*****
 
@@ -91,9 +94,46 @@ class BertweetModel:
         )
         self.trainer.train()
 
+    # ******* A function to predict a single new data ******
+
+    def predict(self, dataset):
+      if self.trainer is None:
+        raise ValueError("Model has not yet been trained")
+      return self.trainer.predict(dataset)
+
+    # Predict for a single data
+    def predict_single(self, text):
+      inputs = self.tokenizer(
+          text, truncation=True, padding=True, return_tensors="pt"
+      ).to(self.device)
+
+      with torch.no_grad():
+        outputs = self.model(**inputs)
+      probs = torch.softmax(outputs.logits, dim=1)
+      return torch.argmax(probs), probs
+
     # ***** A function to evaluate the model's performance *****
 
     def evaluate(self, dataset):
         if self.trainer is None:
             raise ValueError("Model has not been trained yet...")
         return self.trainer.evaluate(eval_dataset=dataset)
+
+   # ****** A function to print the metrics summary
+
+    def print_metrics_summary(self, eval_results):
+      print("\n Evaluation Metrics:")
+      for k, v in eval_results.items():
+          print(f"{k}: {v:.4f}")
+
+     # **** A function to display the confusion matrix ****
+
+    def plot_confusion_matrix(self, dataset):
+      predictions = self.trainer.predict(dataset)
+      preds = np.argmax(predictions.predictions, axis=1)
+      labels = predictions.label_ids
+
+      cm = confusion_matrix(labels, preds)
+      disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+      disp.plot(cmap="Blues")
+      plt.show()
