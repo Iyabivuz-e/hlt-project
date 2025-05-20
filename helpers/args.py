@@ -1,7 +1,7 @@
 # Ttaining arguments to use over here---- it is as a helper function
 from transformers import TrainingArguments
 
-train_arg = TrainingArguments(
+training_arg = TrainingArguments(
     output_dir="./results",
     evaluation_strategy="epoch",
     save_strategy="epoch",

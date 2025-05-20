@@ -1,35 +1,82 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments, glue_compute_metrics
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, glue_compute_metrics
 import numpy as np
 import torch
 from helpers import *
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
-
-model_name = "vinai/bertweet-base"
-
+## A class that contains the finetuning of bertweet model
 class BertweetModel:
-    def __init__(self, model_name=model_name):
+    def __init__(self, model_name=model_name, num_labels):
+        # Initializing the model's instance variables
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
+        self.trainer = None
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
 
-    def preprocess(self, example):
+
+    # *******A function to load the dataset and then convert it into the huggingface standard*******
+    def load_dataset(self, df_path, df_format="csv"):
+        if df_format == "csv":
+            dataset = Dataset.from_pandas(pd.read_csv(df_path))
+        else:
+            raise ValueError(f"unsupported data format: {df_format}")
+        return dataset
+
+
+    # *******A function to tokenize the dataset******
+    def tokenize_function(self, example):
         return self.tokenizer(example["text"], truncation=True, padding="max_length", max_length=128)
+
+
+    # ***** A function to tokenize the dataset and then preprocess it*****
+    def preprocess_data(self, dataset):
+        tokenized_datasets = dataset.map(self.tokenize_function, batched=True)
+        return tokenized_datasets
     
-    def comput_metrics(self, predict):
-        preds = np.argmax(predict.predictions, axis=1)
-        labels = predict.label_ids # will hsvr to  of the labels
-        return {
-            "accuracy": accuracy_score(labels, preds),
-            "f1": f1_score(labels, preds, average="weighted")
-        }
-       """ trainer = Trainer(
-            model=model,
-            args=train_args,
-            train_dataset="new_dataset",
-            eval_dataset="new dataset",
-            tokenizer = tokenizer,
-            compute_metrics=compute_metrics
-            )
-        traimer.train()"""
+    
+        # *******function to compute the metrics for the model********
+    def compute_metrics(self, evaluate_predictions):
+        logits, labels = evaluate_predictions
+        predictions = np.argmax(logits, axis=1)
+
+        accuracy_metric = evaluate.load("accuracy")
+        accuracy = accuracy_metrics.compute(
+            predictions=predictions, refrences=labels)
+
+        # Check if the task is binary or multinomial then load more metrics methods
+        if self.num_labels > 2:
+            f1_metric = evaluate.load("f1")
+            f1 = f1_metric.compute(predictions=predictions, references=labels, average="weighted")
+            return {
+                "accuracy": accuracy["accuracy"], "f1_wighted": f1["f1"]
+            }
+        else:
+            f1_metric = evaluate.load("f1")
+            f1 = f1_metric.compute(
+                predictions=predictions, references=labels)
+            return {
+                "accuracy": accuracy["accuracy"], "f1_wighted": f1["f1"]
+            }
+
+
+    # ******* A function to finetune(train) the model*****
+    def train(self, train_dataset, eval_dataset, training_args):
+        self.trainer = Trainer(
+            model = self.model,
+            train_dataset = train_dataset,
+            eval_dataset = eval_dataset,
+            args=training_args,
+            compute_metrics=self.compute_metrics,
+            tokenizer = self.tokenizer
+        )
+        self.trainer.train()
+
+
+    # ***** A function to evaluate the model's performance *****
+    def evaluate(self, dataset):
+        if self.trainer is None:
+            raise ValueError("Model has not been trained yet...")
+        return self.trainer.evaluate(eval_dataset=dataset)
+
