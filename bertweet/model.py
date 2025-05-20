@@ -3,11 +3,10 @@ import numpy as np
 from datasets import Dataset
 import evaluate
 import torch
-from helpers import *
 
 ## A class that contains the finetuning of bertweet model
 class BertweetModel:
-    def __init__(self, model_name=model_name, num_labels):
+    def __init__(self, num_labels, model_name):
         # Initializing the model's instance variables
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
@@ -35,8 +34,8 @@ class BertweetModel:
     def preprocess_data(self, dataset):
         tokenized_datasets = dataset.map(self.tokenize_function, batched=True)
         return tokenized_datasets
-    
-    
+
+
         # *******function to compute the metrics for the model********
     def compute_metrics(self, evaluate_predictions):
         logits, labels = evaluate_predictions
