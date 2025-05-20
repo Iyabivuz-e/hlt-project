@@ -1,8 +1,9 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, glue_compute_metrics
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer
 import numpy as np
+from datasets import Dataset
+import evaluate
 import torch
 from helpers import *
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 ## A class that contains the finetuning of bertweet model
 class BertweetModel:
