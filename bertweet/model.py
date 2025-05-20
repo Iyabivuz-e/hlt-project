@@ -3,6 +3,7 @@ import numpy as np
 from datasets import Dataset
 import evaluate
 import torch
+import pandas as pd
 
 ## A class that contains the finetuning of bertweet model
 class BertweetModel:
@@ -14,6 +15,12 @@ class BertweetModel:
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
+
+
+    ## ****A function to freeze some layers and train the head******
+    def freeze_baase_model(self):
+        for params in self.model.roberta.parameters():
+            params.requires_grad = False
 
 
     # *******A function to load the dataset and then convert it into the huggingface standard*******
@@ -42,7 +49,7 @@ class BertweetModel:
         predictions = np.argmax(logits, axis=1)
 
         accuracy_metric = evaluate.load("accuracy")
-        accuracy = accuracy_metrics.compute(
+        accuracy = accuracy_metric.compute(
             predictions=predictions, refrences=labels)
 
         # Check if the task is binary or multinomial then load more metrics methods
