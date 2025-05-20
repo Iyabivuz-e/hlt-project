@@ -34,7 +34,7 @@ class BertweetModel:
 
     # *******A function to tokenize the dataset******
     def tokenize_function(self, example):
-        return self.tokenizer(example["text"], truncation=True, padding="max_length", max_length=128)
+        return self.tokenizer(example["tweet_soft"], truncation=True, padding="max_length", max_length=128)
 
 
     # ***** A function to tokenize the dataset and then preprocess it*****
