@@ -224,7 +224,7 @@ def test():
         y_true, y_pred,
         target_names=["non-cyberbullying", "cyberbullying"]
     ))
-    print("Confusion matrix:\n", confusion_matrix(y_true, y_pred))
+    print("Confusion matrix:\n",  (y_true, y_pred))
 
     # — ROC —
     fpr, tpr, _ = roc_curve(y_true, probs)
