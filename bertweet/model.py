@@ -79,7 +79,6 @@ class BertweetModel:
                 "accuracy": accuracy["accuracy"], "f1_weighted": f1["f1"]
             }
 
-    # print("Training on device:", self.device)
 
     # ******* A function to finetune(train) the model*****
 
