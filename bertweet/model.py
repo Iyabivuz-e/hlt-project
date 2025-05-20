@@ -24,12 +24,4 @@ class BertweetModel:
             "accuracy": accuracy_score(labels, preds),
             "f1": f1_score(labels, preds, average="weighted")
         }
-       """ trainer = Trainer(
-            model=model,
-            args=train_args,
-            train_dataset="new_dataset",
-            eval_dataset="new dataset",
-            tokenizer = tokenizer,
-            compute_metrics=compute_metrics
-            )
-        traimer.train()"""
+       
