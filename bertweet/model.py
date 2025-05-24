@@ -125,6 +125,20 @@ class BertweetModel:
       for k, v in eval_results.items():
           print(f"{k}: {v:.4f}")
 
+    ## ******* A function to save the model and tokenizer *****
+    
+    def save_model(self, model_path):
+        self.model.save_pretrained(model_path)
+        self.tokenizer.save_pretrained(model_path)
+
+    # ******* A function to load the model and tokenizer *****
+
+    def load_model(self, model_path):
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.model.to(self.device)
+        self.trainer = Trainer(model=self.model, tokenizer=self.tokenizer)    
+
      # **** A function to display the confusion matrix ****
 
     def plot_confusion_matrix(self, dataset):
