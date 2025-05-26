@@ -11,6 +11,11 @@ from sklearn.model_selection import RandomizedSearchCV
 from scipy.stats import uniform
 
 ############################################################
+"import fasttext model"
+import fasttext
+import scripts.config
+
+############################################################
 "import distilroberta model"
 import os
 import torch
@@ -44,11 +49,13 @@ def load_all_models_bin():
     model_roberta, tok_roberta = load_model_pickle("models/models_bin/Roberta/best_model","roberta-base")
     model_distil, tok_distil = load_model_pickle("models/models_bin/DistilRoberta/best_model","distilroberta-base")
     model_mamba = get_mamba_binary()
+    model_fasttext = fasttext.load_model(FASTTEXT_BINARY_PATH)
 
     ensemble_models = [
         (model_roberta, tok_roberta, "roberta-base"),
         (model_distil, tok_distil, "distilroberta-base"),
         (model_mamba, None, "mamba"),
+        (model_fasttext, None, "fasttext"),
     ]
     return logistic, ensemble_models
 
@@ -64,11 +71,13 @@ def load_all_models_mul():
     model_roberta, tok_roberta = load_model_pickle("models/models_mul/Roberta/best_model","roberta-base")
     model_distil, tok_distil = load_model_pickle("models/models_mul/DistilRoberta/best_model","distilroberta-base")
     model_mamba = get_mamba_multi()
+    model_fasttext = fasttext.load_model(FASTTEXT_MULTICLASS_PATH)
 
     ensemble_models = [
         (model_roberta, tok_roberta, "roberta-base"),
         (model_distil, tok_distil, "distilroberta-base"),
         (model_mamba, None, "mamba"),
+        (model_fasttext, None, "fasttext"),
     ]
     return logistic, ensemble_models
 
