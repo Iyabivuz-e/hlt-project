@@ -10,10 +10,19 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import RandomizedSearchCV
 from scipy.stats import uniform
 
+
 ############################################################
 "import fasttext model"
 import fasttext
-import scripts.config
+from scripts.config import *
+
+############################################################
+
+############################################################
+"import bertweet model"
+from bertweet.helpers import *
+from bertweet.model import *
+from scripts.config import *
 
 ############################################################
 "import distilroberta model"
@@ -50,12 +59,14 @@ def load_all_models_bin():
     model_distil, tok_distil = load_model_pickle("models/models_bin/DistilRoberta/best_model","distilroberta-base")
     model_mamba = get_mamba_binary()
     model_fasttext = fasttext.load_model(FASTTEXT_BINARY_PATH)
+    bertweet, bertweet_tokenizer = load_bertweet_binary()
 
     ensemble_models = [
         (model_roberta, tok_roberta, "roberta-base"),
         (model_distil, tok_distil, "distilroberta-base"),
         (model_mamba, None, "mamba"),
         (model_fasttext, None, "fasttext"),
+        (bertweet, bertweet_tokenizer, "bertweet"),
     ]
     return logistic, ensemble_models
 
@@ -72,12 +83,15 @@ def load_all_models_mul():
     model_distil, tok_distil = load_model_pickle("models/models_mul/DistilRoberta/best_model","distilroberta-base")
     model_mamba = get_mamba_multi()
     model_fasttext = fasttext.load_model(FASTTEXT_MULTICLASS_PATH)
+    bertweet, bertweet_tokenizer = load_bertweet_multi()
 
     ensemble_models = [
         (model_roberta, tok_roberta, "roberta-base"),
         (model_distil, tok_distil, "distilroberta-base"),
         (model_mamba, None, "mamba"),
         (model_fasttext, None, "fasttext"),
+        (bertweet, bertweet_tokenizer, "bertweet"),
+
     ]
     return logistic, ensemble_models
 
@@ -188,5 +202,7 @@ def load_model_pickle(path, model_name, device="cpu"):
 
     return model, tokenizer
 
+############################################################
+"Insert model loader for each model"
 ############################################################
 "Insert model loader for each model"
