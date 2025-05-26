@@ -87,14 +87,11 @@ cyberbullying/
 11. **Advanced Models**
 
 * Fine-tune Transformer models:
-
-  * `bert-base-uncased`
-  * `cardiffnlp/twitter-roberta-base-offensive`
-  * BERT-ADA
   * BERTweet-base
-  * RoBERTa fine-tuned on hate speech subtypes
   * RoBERTa
-* Additional architectures: FastText, Mamba
+* Additional architectures: 
+   - FastText
+   - Mamba
 
 12. **Ensemble Models**
 
@@ -104,12 +101,9 @@ cyberbullying/
 
 13. **Model Evaluation**
 
-* Binary classification: recall for the non-hate class (minimize false positives)
+* Binary classification: precision, recall, accuracy, F1 
 * Multiclass classification: accuracy, macro & micro precision, macro F1-score
 
-14. **Save Splits**
-
-* Save `train.csv`, `val.csv`, `test.csv` into `data/interim/`
 
 ---
 
