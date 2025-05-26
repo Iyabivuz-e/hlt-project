@@ -27,11 +27,11 @@
   "rank_pattern": {},
   "revision": null,
   "target_modules": [
-    "in_proj",
-    "proj_in",
-    "proj_out",
     "x_proj",
-    "out_proj"
+    "proj_in",
+    "out_proj",
+    "in_proj",
+    "proj_out"
   ],
   "task_type": "SEQ_CLS",
   "trainable_token_indices": null,
