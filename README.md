@@ -60,38 +60,56 @@ cyberbullying/
    * Apply text data augmentation (e.g., EDA: synonyms replacement, random insertions)
    * Experiment with class weighting during training
 
-6. **Feature Extraction**  (for baseline and NN)
+6. **Text Preprocessing**
+
+   * `tweet_soft` (for Transformers): removes mentions, links, hashtags only
+   * `tweet_full` (for traditional ML): expands contractions, normalizes repeated characters, lowercases, removes stopwords, lemmatizes, stems, removes punctuation
+
+7. **Feature Extraction**
 
    * Bag of Words (BoW)
    * TF-IDF
 
-7. **Baseline Models**
+8. **Label Encoding**
 
-   * Logistic Regression
-   * Naive Bayes (Bernoulli or Multinomial)
+   * Add `is_cyberbullying` (binary 0/1) and `cyberbullying_label` (multiclass int)
+   * Save label map as `label_mapping.json`
 
-8. **Advanced Models**
+9. **Data Splitting**
 
-   * Fine-tune Transformer models:
+   * Stratified split into train/val/test (90% dev, 10% test; then 81/19 split of dev)
 
-     * `bert-base-uncased`
-     * `cardiffnlp/twitter-roberta-base-offensive`
-     * BERT-ADA
-     * BERTweet-base
-     * RoBERTa fine-tuned on hate speech subtypes
-     * RoBERTa
-   * Other architectures: FastText, Mamba
+10. **Baseline Models**
 
-9. **Ensemble Models**
+* Logistic Regression
+* Naive Bayes (Bernoulli or Multinomial)
 
-   * Combine model predictions via arithmetic mean (tie → favor non-cyberbullying)
-   * Ridge Regression meta-learner
-   * Pipeline approach: sequentially query models based on confidence threshold or until final model produces output
+11. **Advanced Models**
 
-10. **Model Evaluation**
+* Fine-tune Transformer models:
 
-* Binary classification: recall for the "non-hate" class (minimize false positives)
+  * `bert-base-uncased`
+  * `cardiffnlp/twitter-roberta-base-offensive`
+  * BERT-ADA
+  * BERTweet-base
+  * RoBERTa fine-tuned on hate speech subtypes
+  * RoBERTa
+* Additional architectures: FastText, Mamba
+
+12. **Ensemble Models**
+
+* Combine predictions via arithmetic mean (tie → favor non-cyberbullying)
+* Ridge Regression meta-learner
+* Sequential pipeline: query models based on confidence threshold or until final model output
+
+13. **Model Evaluation**
+
+* Binary classification: recall for the non-hate class (minimize false positives)
 * Multiclass classification: accuracy, macro & micro precision, macro F1-score
+
+14. **Save Splits**
+
+* Save `train.csv`, `val.csv`, `test.csv` into `data/interim/`
 
 ---
 
@@ -154,4 +172,3 @@ Required packages include:
 * `contractions`
 * `langdetect`
 * `transformers` (if using BERT-based models)
-
