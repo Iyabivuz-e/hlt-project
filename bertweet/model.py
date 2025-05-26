@@ -9,7 +9,6 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, precision_
 import matplotlib.pyplot as plt
 from peft import LoraConfig, get_peft_model, TaskType, PeftModel
 
-# In bertweet.py or bertweet_models.py
 
 class BaseBertweetModel:
     def __init__(self, num_labels, model_name):
