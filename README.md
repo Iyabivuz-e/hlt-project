@@ -54,27 +54,44 @@ cyberbullying/
 
    * Filter only English tweets using `langdetect`
 
-5. **Text Preprocessing**
+5. **Handling Class Imbalance**
 
-   * `tweet_soft` (for Transformers): removes mentions, links, hashtags only
-   * `tweet_full` (for traditional ML): removes stopwords, applies stemming & lemmatization, etc.
+   * Remove duplicate samples
+   * Apply text data augmentation (e.g., EDA: synonyms replacement, random insertions)
+   * Experiment with class weighting during training
 
-6. **Label Encoding**
+6. **Feature Extraction**  (for baseline and NN)
 
-   * Add:
+   * Bag of Words (BoW)
+   * TF-IDF
 
-     * `is_cyberbullying` → binary label (0/1)
-     * `cyberbullying_label` → multiclass label (int)
-   * Save label map as `label_mapping.json`
-   * Save full preprocessed dataset
+7. **Baseline Models**
 
-7. **Data Splitting**
+   * Logistic Regression
+   * Naive Bayes (Bernoulli or Multinomial)
 
-   * Stratified split into train/val/test (90% dev, 10% test; then 81/19 split of dev)
+8. **Advanced Models**
 
-8. **Save Splits**
+   * Fine-tune Transformer models:
 
-   * Save `train.csv`, `val.csv`, `test.csv` into `data/interim/`
+     * `bert-base-uncased`
+     * `cardiffnlp/twitter-roberta-base-offensive`
+     * BERT-ADA
+     * BERTweet-base
+     * RoBERTa fine-tuned on hate speech subtypes
+     * RoBERTa
+   * Other architectures: FastText, Mamba
+
+9. **Ensemble Models**
+
+   * Combine model predictions via arithmetic mean (tie → favor non-cyberbullying)
+   * Ridge Regression meta-learner
+   * Pipeline approach: sequentially query models based on confidence threshold or until final model produces output
+
+10. **Model Evaluation**
+
+* Binary classification: recall for the "non-hate" class (minimize false positives)
+* Multiclass classification: accuracy, macro & micro precision, macro F1-score
 
 ---
 
@@ -137,3 +154,4 @@ Required packages include:
 * `contractions`
 * `langdetect`
 * `transformers` (if using BERT-based models)
+
