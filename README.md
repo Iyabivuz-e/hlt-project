@@ -54,27 +54,62 @@ cyberbullying/
 
    * Filter only English tweets using `langdetect`
 
-5. **Text Preprocessing**
+5. **Handling Class Imbalance**
+
+   * Remove duplicate samples
+   * Apply text data augmentation (e.g., EDA: synonyms replacement, random insertions)
+   * Experiment with class weighting during training
+
+6. **Text Preprocessing**
 
    * `tweet_soft` (for Transformers): removes mentions, links, hashtags only
-   * `tweet_full` (for traditional ML): removes stopwords, applies stemming & lemmatization, etc.
+   * `tweet_full` (for traditional ML): expands contractions, normalizes repeated characters, lowercases, removes stopwords, lemmatizes, stems, removes punctuation
 
-6. **Label Encoding**
+7. **Feature Extraction**
 
-   * Add:
+   * Bag of Words (BoW)
+   * TF-IDF
 
-     * `is_cyberbullying` → binary label (0/1)
-     * `cyberbullying_label` → multiclass label (int)
+8. **Label Encoding**
+
+   * Add `is_cyberbullying` (binary 0/1) and `cyberbullying_label` (multiclass int)
    * Save label map as `label_mapping.json`
-   * Save full preprocessed dataset
 
-7. **Data Splitting**
+9. **Data Splitting**
 
    * Stratified split into train/val/test (90% dev, 10% test; then 81/19 split of dev)
 
-8. **Save Splits**
+10. **Baseline Models**
 
-   * Save `train.csv`, `val.csv`, `test.csv` into `data/interim/`
+* Logistic Regression
+* Naive Bayes (Bernoulli or Multinomial)
+
+11. **Advanced Models**
+
+* Fine-tune Transformer models:
+
+  * `bert-base-uncased`
+  * `cardiffnlp/twitter-roberta-base-offensive`
+  * BERT-ADA
+  * BERTweet-base
+  * RoBERTa fine-tuned on hate speech subtypes
+  * RoBERTa
+* Additional architectures: FastText, Mamba
+
+12. **Ensemble Models**
+
+* Combine predictions via arithmetic mean (tie → favor non-cyberbullying)
+* Ridge Regression meta-learner
+* Sequential pipeline: query models based on confidence threshold or until final model output
+
+13. **Model Evaluation**
+
+* Binary classification: recall for the non-hate class (minimize false positives)
+* Multiclass classification: accuracy, macro & micro precision, macro F1-score
+
+14. **Save Splits**
+
+* Save `train.csv`, `val.csv`, `test.csv` into `data/interim/`
 
 ---
 
