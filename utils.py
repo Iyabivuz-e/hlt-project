@@ -20,6 +20,16 @@ from peft import get_peft_model, LoraConfig, PeftModel
 from transformers.modeling_outputs import SequenceClassifierOutput
 
 ############################################################
+"import mamba"
+from transformers import AutoTokenizer, DataCollatorWithPadding
+from hf_mamba_classification import MambaForSequenceClassification
+from peft import PeftModel
+from types import MethodType
+import torch
+from load_mamba_for_predictions import get_mamba_binary
+from load_mamba_for_predictions import get_mamba_multi
+
+############################################################
 "insert call to the model loader"
 
 def load_all_models_bin():
@@ -33,10 +43,12 @@ def load_all_models_bin():
 
     model_roberta, tok_roberta = load_model_pickle("models/models_bin/Roberta/best_model","roberta-base")
     model_distil, tok_distil = load_model_pickle("models/models_bin/DistilRoberta/best_model","distilroberta-base")
+    model_mamba = get_mamba_binary()
 
     ensemble_models = [
-        (model_roberta, tok_roberta),
-        (model_distil, tok_distil),
+        (model_roberta, tok_roberta, "roberta-base"),
+        (model_distil, tok_distil, "distilroberta-base"),
+        (model_mamba, None, "mamba"),
     ]
     return logistic, ensemble_models
 
@@ -51,10 +63,12 @@ def load_all_models_mul():
 
     model_roberta, tok_roberta = load_model_pickle("models/models_mul/Roberta/best_model","roberta-base")
     model_distil, tok_distil = load_model_pickle("models/models_mul/DistilRoberta/best_model","distilroberta-base")
+    model_mamba = get_mamba_multi()
 
     ensemble_models = [
-        (model_roberta, tok_roberta),
-        (model_distil, tok_distil),
+        (model_roberta, tok_roberta, "roberta-base"),
+        (model_distil, tok_distil, "distilroberta-base"),
+        (model_mamba, None, "mamba"),
     ]
     return logistic, ensemble_models
 
