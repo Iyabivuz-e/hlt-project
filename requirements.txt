@@ -13,5 +13,5 @@ causal-conv1d
 mamba-ssm
 accelerate
 evaluate
-
-
+fasttext==0.9.3
+numpy==1.26.4
