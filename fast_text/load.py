@@ -13,6 +13,3 @@ def load_fasttext(mode: str):
     gdown.download(f"https://drive.google.com/uc?id={file_id}", output_path, quiet=False)
     
     return fasttext.load_model(output_path)
-
-if __name__ == "__main__":
-    model = load_fasttext("binary")
