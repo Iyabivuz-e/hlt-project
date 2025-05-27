@@ -67,7 +67,7 @@ def load_all_models_bin():
         (model_distil, tok_distil, "distilroberta-base"),
         (model_mamba, None, "mamba"),
         (model_fasttext, None, "fasttext"),
-        (bertweet, bertweet_tokenizer, "bertweet"),
+        (bertweet, bertweet_tokenizer, "vinai/bertweet-base"),
     ]
     return logistic, ensemble_models
 
@@ -91,7 +91,7 @@ def load_all_models_mul():
         (model_distil, tok_distil, "distilroberta-base"),
         (model_mamba, None, "mamba"),
         (model_fasttext, None, "fasttext"),
-        (bertweet, bertweet_tokenizer, "bertweet"),
+        (bertweet, bertweet_tokenizer, "vinai/bertweet-base"),
 
     ]
     return logistic, ensemble_models
