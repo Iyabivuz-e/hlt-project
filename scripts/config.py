@@ -44,6 +44,3 @@ SIMILARITY_THRESHOLD = 0.85
 
 # Save options
 SAVE_SPLITS = True
-
-FASTTEXT_BINARY_PATH="https://drive.google.com/file/d/1_iCbXY1yyZ536iNnzowJQFzJ9sSVvz4J/view?usp=sharing"
-FASTTEXT_MULTICLASS_PATH="https://drive.google.com/file/d/1-E62aKmSF04OnA_8112XQwhFAUR2Uf3s/view?usp=sharing"

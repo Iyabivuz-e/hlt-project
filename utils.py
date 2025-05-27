@@ -13,8 +13,7 @@ from scipy.stats import uniform
 
 ############################################################
 "import fasttext model"
-import fasttext
-from scripts.config import *
+from fast_text.load import load_fasttext
 
 ############################################################
 
@@ -58,8 +57,8 @@ def load_all_models_bin():
     model_roberta, tok_roberta = load_model_pickle("models/models_bin/Roberta/best_model","roberta-base")
     model_distil, tok_distil = load_model_pickle("models/models_bin/DistilRoberta/best_model","distilroberta-base")
     model_mamba = get_mamba_binary()
-    model_fasttext = fasttext.load_model(FASTTEXT_BINARY_PATH)
-    bertweet, bertweet_tokenizer = load_bertweet_binary()
+    model_fasttext = load_fasttext("binary")
+    bertweet, bertweet_tokenizer = load_bertweet_bin()
 
     ensemble_models = [
         (model_roberta, tok_roberta, "roberta-base"),
@@ -82,7 +81,7 @@ def load_all_models_mul():
     model_roberta, tok_roberta = load_model_pickle("models/models_mul/Roberta/best_model","roberta-base")
     model_distil, tok_distil = load_model_pickle("models/models_mul/DistilRoberta/best_model","distilroberta-base")
     model_mamba = get_mamba_multi()
-    model_fasttext = fasttext.load_model(FASTTEXT_MULTICLASS_PATH)
+    model_fasttext = load_fasttext("multiclass")
     bertweet, bertweet_tokenizer = load_bertweet_multi()
 
     ensemble_models = [
