@@ -6,6 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
+# bertweet
+*.pt
+*.bin
+*.joblib
+/bertweet/results/*
+
+
 # Distribution / packaging
 .Python
 build/
