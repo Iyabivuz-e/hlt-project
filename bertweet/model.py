@@ -96,12 +96,103 @@ class BaseBertweetModel:
         self.model.save_pretrained(model_path)
         self.tokenizer.save_pretrained(model_path)
 
+    # merge_and_save_model method 
+    def merge_and_save_model(self, save_path):
+        """
+        Merge LoRA weights with base model and save
+        """
+        try:
+            print(f"Starting merge process...")
+            print(f"Save path: {save_path}")
+            
+            # Check if model is actually a PEFT model
+            from peft import PeftModel
+            if not isinstance(self.model, PeftModel):
+                print("Warning: Model is not a PEFT model, cannot merge")
+                # Just save the regular model instead
+                self.model.save_pretrained(save_path)
+                self.tokenizer.save_pretrained(save_path)
+                print(f"Regular model saved to {save_path}")
+                return
+            
+            # Creating a directory if it doesn't exist
+            import os
+            os.makedirs(save_path, exist_ok=True)
+            print(f"Created directory: {save_path}")
+            
+            # Merge and unload
+            print("Merging LoRA weights with base model...")
+            merged_model = self.model.merge_and_unload()
+            print("Merge completed successfully")
+            
+            # Save merged model
+            print("Saving merged model...")
+            merged_model.save_pretrained(save_path)
+            print("Merged model saved")
+            
+            # Save tokenizer
+            print("Saving tokenizer...")
+            self.tokenizer.save_pretrained(save_path)
+            print("Tokenizer saved")
+            
+            print(f"Successfully merged and saved model to: {save_path}")
+            
+            # Verify files were created
+            files = os.listdir(save_path)
+            print(f"Files in save directory: {files}")
+            
+        except Exception as e:
+            print(f"Error during merge and save: {e}")
+            import traceback
+            traceback.print_exc()
+            
+
     def load_model(self, model_path):
         base_model = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=self.num_labels)
         self.model = PeftModel.from_pretrained(base_model, model_path)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
         self.model.to(self.device)
         self.trainer = None
+
+    def plot_confusion_matrix(self, dataset):
+        """Plot confusion matrix for evaluation dataset"""
+        try:
+            if self.trainer is None:
+                print("Warning: No trainer available for confusion matrix")
+                return
+            
+            predictions = self.trainer.predict(dataset)
+            y_pred = np.argmax(predictions.predictions, axis=1)
+            y_true = predictions.label_ids
+            
+            # Create confusion matrix
+            cm = confusion_matrix(y_true, y_pred)
+            disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+            
+            plt.figure(figsize=(8, 6))
+            disp.plot(cmap='Blues')
+            plt.title('Confusion Matrix')
+            plt.show()
+            
+        except Exception as e:
+            print(f"Error creating confusion matrix: {e}")
+
+    def print_metrics_summary(self, eval_results):
+        """summary of evaluation metrics"""
+        try:
+            print("\n" + "="*50)
+            print("EVALUATION RESULTS SUMMARY")
+            print("="*50)
+            
+            for key, value in eval_results.items():
+                if isinstance(value, float):
+                    print(f"{key}: {value:.4f}")
+                else:
+                    print(f"{key}: {value}")
+            print("="*50 + "\n")
+            
+        except Exception as e:
+            print(f"Error printing metrics summary: {e}")
 
 
 class BertweetModelBinary(BaseBertweetModel):
