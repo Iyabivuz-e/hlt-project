@@ -100,7 +100,6 @@ checkpoints/
 # Large datasets (handle with DVC or manually)
 data/
 datasets/
-*.csv
 *.tsv
 *.json
 *.xlsx
