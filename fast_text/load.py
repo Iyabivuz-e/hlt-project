@@ -7,9 +7,10 @@ FASTTEXT_MULTICLASS_ID = "1-E62aKmSF04OnA_8112XQwhFAUR2Uf3s"
 
 def load_fasttext(mode: str):
     os.makedirs("models", exist_ok=True)
-
-    file_id = FASTTEXT_MULTICLASS_ID if mode != "binary" else FASTTEXT_BINARY_ID
     output_path = f"models/fasttext_{mode}.bin"
-    gdown.download(f"https://drive.google.com/uc?id={file_id}", output_path, quiet=False)
+
+    if not os.path.exists(output_path):
+        file_id = FASTTEXT_MULTICLASS_ID if mode != "binary" else FASTTEXT_BINARY_ID
+        gdown.download(f"https://drive.google.com/uc?id={file_id}", output_path, quiet=False)
     
     return fasttext.load_model(output_path)
