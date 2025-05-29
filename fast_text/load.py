@@ -8,3 +8,4 @@ def load_fasttext(mode: str):
 
 if __name__ == "__main__":
     model = load_fasttext("binary")
+

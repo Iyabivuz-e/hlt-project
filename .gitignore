@@ -6,6 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
+# bertweet
+*.pt
+*.bin
+*.joblib
+/bertweet/results/*
+
+
 # Distribution / packaging
 .Python
 build/
@@ -93,7 +100,6 @@ checkpoints/
 # Large datasets (handle with DVC or manually)
 data/
 datasets/
-*.csv
 *.tsv
 *.json
 *.xlsx

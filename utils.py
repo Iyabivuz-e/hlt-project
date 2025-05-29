@@ -58,14 +58,16 @@ def load_all_models_bin():
     model_distil, tok_distil = load_model_pickle("models/models_bin/DistilRoberta/best_model","distilroberta-base")
     model_mamba = get_mamba_binary()
     model_fasttext = load_fasttext("binary")
-    bertweet, bertweet_tokenizer = load_bertweet_binary()
+
+    bertweet, bertweet_tokenizer = load_bertweet_bin()
+
 
     ensemble_models = [
         (model_roberta, tok_roberta, "roberta-base"),
         (model_distil, tok_distil, "distilroberta-base"),
         (model_mamba, None, "mamba"),
         (model_fasttext, None, "fasttext"),
-        (bertweet, bertweet_tokenizer, "bertweet"),
+        (bertweet, bertweet_tokenizer, "vinai/bertweet-base"),
     ]
     return logistic, ensemble_models
 
@@ -89,7 +91,7 @@ def load_all_models_mul():
         (model_distil, tok_distil, "distilroberta-base"),
         (model_mamba, None, "mamba"),
         (model_fasttext, None, "fasttext"),
-        (bertweet, bertweet_tokenizer, "bertweet"),
+        (bertweet, bertweet_tokenizer, "vinai/bertweet-base"),
 
     ]
     return logistic, ensemble_models
